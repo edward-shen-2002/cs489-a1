@@ -10,12 +10,32 @@ int main(int argc, char** argv) {
         fprintf(stderr, "Please provide the address of a file as an input.\n");
         return -1;
     }
-    char cmd[BUFSIZE];
-    int ret = snprintf(cmd, BUFSIZE, "wc -c < \"%s\"", argv[1]);
-    if (ret >= BUFSIZE) {
-        fprintf(stderr, "Error: address of file is too long.\n");
+
+    // adapted from: https://cplusplus.com/reference/cstdio/ftell/
+    // open file
+    FILE *fileptr = fopen(argv[1], "rb");
+    if (fileptr == NULL) {
+        fprintf(stderr, "Failed to open file.\n");
         return -1;
-    } 
-    system(cmd);
+    }
+
+    // seek EOF
+    if (fseek(fileptr, 0, SEEK_END) != 0) {
+        fprintf(stderr, "Failed to seek EOF.\n");
+        fclose(fileptr);
+        return -1;
+    }
+
+    // read file size
+    long filesize = ftell(fileptr);
+    if (filesize < 0) {
+        fprintf(stderr, "Failed to determine file size.\n");
+        fclose(fileptr);
+        return -1;
+    }
+
+    // keep output consistent with wc -c
+    printf("%ld\n", filesize);
+
     return 0;
 }
