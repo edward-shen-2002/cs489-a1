@@ -10,7 +10,12 @@ int main(int argc, char** argv) {
         fprintf(stderr, "Please provide the address of a file as an input.\n");
         return -1;
     }
-    char cmd[BUFSIZE] = "wc -c < ";
-    strcat(cmd, argv[1]);
+    char cmd[BUFSIZE];
+    int ret = snprintf(cmd, BUFSIZE, "wc -c < \"%s\"", argv[1]);
+    if (ret >= BUFSIZE) {
+        fprintf(stderr, "Error: address of file is too long.\n");
+        return -1;
+    } 
     system(cmd);
+    return 0;
 }
